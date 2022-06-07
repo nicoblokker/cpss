@@ -9,7 +9,7 @@ library(vegan)
 library(purrr)
 
 # load MaCov21 data, remove duplicate entries (e.g., same party-claim-frame-polarity), and select relevant variables
-macov_complete <-  readr::read_csv("MaCoV21.csv", show_col_types = F) 
+macov_complete <-  readr::read_csv("MaCov21.csv", show_col_types = F) %>% select(claim_cat, frame_cat, actor_id, Polarity) 
 
 macov <- macov_complete %>% 
           .[,c(1:4)] %>%
@@ -41,8 +41,12 @@ wom_pf_cos <- read.csv("WoM_avg_justifications_v2.csv",
                                row.names = 1, check.names = F, fileEncoding = "UTF-8")
 
 # read Party-Claim cosine distance based on S-Bert MaCov (calculations not included)
-macov_pf_cos_bert <- read.csv("MaCov_avg_frames_v3.csv",                                
+macov_pf_cos_bert <- read.csv("MaCov_avg_frames_grouped_by_claims.csv",                                
                        row.names = 1, check.names = F, fileEncoding = "UTF-8")
+
+# read Party-Claim cosine distance based on S-Bert MaCov (calculations not included)
+macov_pf_cos_bert_byf <- read.csv("MaCov_avg_frames_grouped_by_frames.csv",                                # grouped by frames (v2)
+                                  row.names = 1, check.names = F, fileEncoding = "UTF-8")
 
 # read Party-Claim cosine distance based on S-Bert Macov (calculations not included)
 macov_pc_cos_bert <- read.csv("MaCov_avg_claims_v2.csv", 
@@ -100,32 +104,36 @@ identical(rownames(wom_pc_cos), rownames(wom_pf_cos))
 vegan::mantel(as.dist(1-wom_pc_cos), as.dist(1-wom_pf_cos),          # r = 0.53, p = 0.001
               method = "pearson", permutations = 1000)
 
-# correlation between cosine matrices Macov P-C and Wom P-C
-wom_pc_cos2 <- wom_pc_cos[c(3,1,4,6,2,5), c(3,1,4,6,2,5)]            # re-arrange rows and columns to match the ones from Macov
-vegan::mantel(as.dist(1-macov_pc_cos), as.dist(1-wom_pc_cos2),       # r = 0.63, p = 0.013
-              method = "pearson", permutations = 1000)
-
-# correlation between cosine matrices Macov P-F and Wom P-F
-wom_pf_cos2 <- wom_pf_cos[c(3,1,4,6,2,5), c(3,1,4,6,2,5)]            # re-arrange rows and columns to match the ones from Macov
-vegan::mantel(as.dist(1-macov_pf_cos), as.dist(1-wom_pf_cos2),       # r = 0.64, p = 0.013
-              method = "pearson", permutations = 1000)
-
 # Macov correlation between cosine matrices P-C  bert and P-C label
 macov_pc_cos_bert2 <- macov_pc_cos_bert[c(1,2,3,4,6,5), c(1,2,3,4,6,5)]
 identical(rownames(macov_pc_cos), rownames(macov_pc_cos_bert2))
 vegan::mantel(as.dist(1-macov_pc_cos_bert2), as.dist(1-macov_pc_cos), # r = 0.73, p = 0.001     
               method = "pearson", permutations = 1000)
 
-# Macov correlation between cosine matrices PF Bert and PF label
+# Macov correlation between cosine matrices PF Bert and PF label GROUPED BY CLAIMS
 macov_pf_cos_bert2 <- macov_pf_cos_bert[c(1,2,3,4,6,5), c(1,2,3,4,6,5)] 
 identical(rownames(macov_pf_cos), rownames(macov_pf_cos_bert2))
-vegan::mantel(as.dist(1-macov_pf_cos_bert2), as.dist(1-macov_pf_cos),  #r = 0.40, p = 0.07     
+vegan::mantel(as.dist(1-macov_pf_cos_bert2), as.dist(1-macov_pf_cos),  #r = 0.41, p = 0.07     
+              method = "pearson", permutations = 1000)
+
+# Macov correlation between cosine matrices PF Bert and PF label GROUPED BY FRAMES
+macov_pf_cos_bert_byf[is.na(macov_pf_cos_bert_byf)] <- 0                      # set NAs to 0: they do not address the same arguments, therefore maximum difference
+macov_pf_cos_bert2_byf <- macov_pf_cos_bert_byf[c(1,2,3,4,6,5), c(1,2,3,4,6,5)] 
+identical(rownames(macov_pf_cos), rownames(macov_pf_cos_bert2_byf))
+vegan::mantel(as.dist(1-macov_pf_cos_bert2_byf), as.dist(1-macov_pf_cos),  #r = 0.52, p = 0.04     
               method = "pearson", permutations = 1000)
 
 # Macvoc correlation between the two berts
-identical(rownames(macov_pf_cos_bert2), rownames(macov_pc_cos_bert2))
-vegan::mantel(as.dist(1-macov_pf_cos_bert2), as.dist(1-macov_pc_cos_bert2),  # r = 0.4, p = 0.09       
+identical(rownames(macov_pc_cos), rownames(macov_pf_cos_bert2))
+vegan::mantel(as.dist(1-macov_pc_cos), as.dist(1-macov_pf_cos_bert2),  # r = 0.4, p = 0.09       
               method = "pearson", permutations = 1000)
+
+
+# Macvoc correlation between the two berts (grouped by frames)
+identical(rownames(macov_pc_cos), rownames(macov_pf_cos_bert2_byf))
+vegan::mantel(as.dist(1-macov_pc_cos), as.dist(1-macov_pf_cos_bert2_byf),  # r = 0.32, p = 0.16       
+              method = "pearson", permutations = 1000)
+
 
 
 # 03 a) MaCov: clustering based on similarities ------------------------------
@@ -147,13 +155,13 @@ kmeans(t(macov_pf), 2)                                                   # confi
 macov_hclu_pf_bert <- hclust(as.dist(1-macov_pf_cos_bert), method = "ward.D2")# transform similarity matrix into distance
 coef.hclust(macov_hclu_pf_bert)                                               # agglomerative coefficient of ~0.41
 cutree(macov_hclu_pf_bert, 2)                                                 # We don' see a very similar picture emerge as we saw in the MaCov data
-plot(macov_hclu_pf_bert)
+
 
 # PArty-Claim Cluster Bert
 macov_hclu_pc_bert <- hclust(as.dist(1-macov_pc_cos_bert), method = "ward.D2")# transform similarity matrix into distance
 coef.hclust(macov_hclu_pc_bert)                                               # agglomerative coefficient of ~0.52
 cutree(macov_hclu_pc_bert, 2)                                                 # We don't see a very similar picture emerge as we saw in the MaCov data
-plot(macov_hclu_pc_bert)
+
 
 # 03 b) WoM: clustering based on similarities ------------------------------
 
