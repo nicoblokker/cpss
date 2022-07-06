@@ -133,9 +133,15 @@ vegan::mantel(as.dist(1-macov_pc_cos), as.dist(1-macov_pf_cos_bert2_byf),       
               method = "pearson", permutations = 1000)
 
 
-# Macvoc correlation between the P-C text and P-F text (grouped by claims)
+# Macvoc correlation between the P-C text and P-F text (grouped by frames)
 identical(rownames(macov_pc_cos_bert2), rownames(macov_pf_cos_bert2_byf))
 vegan::mantel(as.dist(1-macov_pc_cos_bert2), as.dist(1-macov_pf_cos_bert2_byf), # r = 0.49, p = 0.09       
+              method = "pearson", permutations = 1000)
+
+
+# Macvoc correlation between the P-C text and P-F text (grouped by claims)
+identical(rownames(macov_pc_cos_bert2), rownames(macov_pf_cos_bert2))
+vegan::mantel(as.dist(1-macov_pc_cos_bert2), as.dist(1-macov_pf_cos_bert2),     # r = 0.40, p = 0.09       
               method = "pearson", permutations = 1000)
 
 
