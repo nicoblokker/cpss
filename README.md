@@ -3,7 +3,16 @@ Replication files
 
 ## Contents
 
-This folder contains the main data set (`MaCov21.csv`), the script used
+This repository contains the replication files of the following
+publication:
+
+> Why Justifications of Claims Matter for Understanding Party Positions.
+> In: Proceedings of the 2nd Workshop on Computational Linguistics for
+> Political Text Analysis. 2022. Nico Blokker, Tanise Ceron, André
+> Blessing, Erenay Dayanik, Sebastian Haunss, Jonas Kuhn, Gabriella
+> Lapesa and Sebastian Padó.
+
+In detail it contains the main data set (`MaCov21.csv`), the script used
 for analysis (`Analysis.R`), as well as the calculations for cosine
 similarities based on SBERT (see below).
 

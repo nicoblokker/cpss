@@ -206,3 +206,34 @@ wom_mds_c_df <- data.frame(mds_c = wom_mds_c, mds_f = wom_mds_f, group = "WoM21"
 df_mds <- full_join(macov_mds_df, wom_mds_c_df) %>% mutate(label = tolower(label))
 df_mds$label <- c("AfD", "CDU", "FDP", "Greens", "SPD", "Left",
                    "CDU", "SPD", "AfD", "FDP", "Left", "Greens")
+
+
+# 17.08.2022 addressing reviewer comment  --------------------------------------
+
+# create tripartite Party-Claim-Frame cluster (P-C-F)
+
+rel_pcf <- macov[, c(1,2,3,4)] %>%                      
+          mutate(Polarity = ifelse(Polarity == "+", 1, -1)) %>% 
+          rename(weight = Polarity) %>%
+          distinct(.keep_all = T)                 # remove redundant rows
+
+d_pcf <- tidyr::pivot_longer(rel_pcf, -c(actor_id, weight)) %>% select(actor_id, value, weight)
+
+g_pcf <- graph_from_data_frame(d_pcf, directed = F)
+V(g_pcf)$type <- bipartite.mapping(g_pcf)$type
+macov_pcf <- get.incidence(g_pcf, sparse = F, attr = "weight")
+macov_pcf_overlap <- (macov_pcf) %*% t(macov_pcf)
+macov_pcf_cos <- lsa::cosine(t(macov_pcf))
+
+
+macov_hclu_pcf <- hclust(as.dist(1-macov_pcf_cos), method = "ward.D2")     
+coef.hclust(macov_hclu_pcf)                                               
+cutree(macov_hclu_pcf, 3)                                                 
+kmeans((macov_pcf), 3)  
+
+
+par(mfrow = c(1,3))
+plot(macov_hclu_pc, main = "Party-Claim Cluster")      # P-C Cluster
+plot(macov_hclu_pf, main = "Party-frame Cluster")      # P-F Cluster
+plot(macov_hclu_pcf, main = "Party-Claim-Frame Cluster")   # mix of the P-C and P-F clusters but more similar to P-F
+
