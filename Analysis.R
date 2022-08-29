@@ -1,3 +1,40 @@
+# Replication script for the analysis conducted in:
+
+# Why Justifications of Claims Matter for Understanding Party Positions. 
+#     In: Proceedings of the 2nd Workshop on Computational Linguistics for Political Text Analysis. 2022.
+#     Nico Blokker, Tanise Ceron, André Blessing, Erenay Dayanik, Sebastian Haunss, 
+#     Jonas Kuhn, Gabriella Lapesa and Sebastian Padó.
+
+# sessionInfo()
+# R version 4.1.1 (2021-08-10)
+# Platform: x86_64-w64-mingw32/x64 (64-bit)
+# Running under: Windows 10 x64 (build 19044)
+# 
+# Matrix products: default
+# 
+# locale:
+#           [1] LC_COLLATE=English_Germany.1252  LC_CTYPE=English_Germany.1252    LC_MONETARY=English_Germany.1252 LC_NUMERIC=C                    
+# [5] LC_TIME=English_Germany.1252    
+# 
+# attached base packages:
+#           [1] stats     graphics  grDevices utils     datasets  methods   base     
+# 
+# other attached packages:
+#           [1] purrr_0.3.4     vegan_2.5-7     lattice_0.20-44 permute_0.9-5   readr_2.0.1     lsa_0.73.2      SnowballC_0.7.0 cluster_2.1.2  
+# [9] igraph_1.3.4    dplyr_1.0.7    
+# 
+# loaded via a namespace (and not attached):
+#           [1] ggrepel_0.9.1      Rcpp_1.0.7         svglite_2.0.0      tidyr_1.1.3        assertthat_0.2.1   digest_0.6.29      utf8_1.2.2        
+# [8] R6_2.5.1           evaluate_0.15      httr_1.4.2         ggplot2_3.3.6.9000 pillar_1.7.0       rlang_1.0.2        rstudioapi_0.13   
+# [15] Matrix_1.4-1       rmarkdown_2.13     splines_4.1.1      webshot_0.5.2      stringr_1.4.0      pheatmap_1.0.12    bit_4.0.4         
+# [22] munsell_0.5.0      compiler_4.1.1     xfun_0.30          pkgconfig_2.0.3    systemfonts_1.0.4  inception2r_0.1.0  mgcv_1.8-36       
+# [29] htmltools_0.5.2    tidyselect_1.1.1   tibble_3.1.4       fansi_0.5.0        viridisLite_0.4.0  withr_2.5.0        crayon_1.5.1      
+# [36] tzdb_0.1.2         MASS_7.3-54        grid_4.1.1         nlme_3.1-152       gtable_0.3.0       lifecycle_1.0.1    DBI_1.1.1         
+# [43] magrittr_2.0.3     scales_1.2.0       cli_3.0.1          stringi_1.7.6      vroom_1.5.4        xml2_1.3.3         ellipsis_0.3.2    
+# [50] generics_0.1.2     vctrs_0.3.8        cowplot_1.1.1      kableExtra_1.3.4   RColorBrewer_1.1-3 tools_4.1.1        bit64_4.0.5       
+# [57] glue_1.6.2         hms_1.1.0          parallel_4.1.1     fastmap_1.1.0      yaml_2.3.5         colorspace_2.0-2   rvest_1.0.1       
+# [64] knitr_1.39.11
+
 # 00 preparation -----------------------------------------------------------
 
 library(dplyr)
